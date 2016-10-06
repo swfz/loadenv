@@ -55,6 +55,7 @@ func main() {
 
 	command := exec.Command(flag.Args()[1], flag.Args()[2:]...)
 	// fmt.Println("%#v", command)
+	command.Stdin  = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
 	command.Run()
