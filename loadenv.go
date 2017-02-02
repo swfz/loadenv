@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 )
 
@@ -29,11 +30,15 @@ func main() {
 	defer fp.Close()
 
 	scanner := bufio.NewScanner(fp)
+	r, _ := regexp.Compile("^#")
 
 	for scanner.Scan() {
 		// fmt.Println("line:", scanner.Text())
-		env := strings.Split(scanner.Text(), "=")
+		if len(r.FindStringIndex(scanner.Text())) > 0 {
+			continue
+		}
 
+		env := strings.Split(scanner.Text(), "=")
 		if len(env) < 2 {
 			fmt.Println("load env error!!", scanner.Text())
 			continue
@@ -47,15 +52,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	//for _, e := range os.Environ() {
-	//    pair := strings.Split(e, "=")
-	//    fmt.Println(pair[0],pair[1])
-	//}
-	// command := exec.Command(strings.Join(flag.Args()[1:], ","))
-
 	command := exec.Command(flag.Args()[1], flag.Args()[2:]...)
 	// fmt.Println("%#v", command)
-	command.Stdin  = os.Stdin
+	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
 	command.Run()
